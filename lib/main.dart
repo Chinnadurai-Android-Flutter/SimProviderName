@@ -30,7 +30,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  static const platform = MethodChannel('samples.flutter.dev/battery');
+  static const platform = MethodChannel('samples.flutter.dev');
   dynamic values;
 
   void _incrementCounter() {
@@ -43,8 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _getBatteryLevel() async {
     // List<String> values = [];
     try {
-      // final int result = await platform.invokeMethod('getBatteryLevel');
-      final dynamic result = await platform.invokeMethod('getBatteryLevel');
+      final dynamic result = await platform.invokeMethod('activeSubscriptionInfoList');
       setState(() {
         values = result;
       });
@@ -98,7 +97,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             try {
                               final dynamic result =
                                   await platform.invokeMethod('SMS', {
-                                'selectedSimSlot': index,
+                                'selectedSimSlotNumber': index,
+                                'selectedSimSlotName': values[index].toString(),
                               });
                               values = result;
                             } on PlatformException catch (e) {
