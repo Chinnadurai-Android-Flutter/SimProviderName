@@ -87,45 +87,47 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             if (values.length != null)
               Expanded(
-                  child: ListView.builder(
-                      itemCount: values.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return GestureDetector(
-                          onTap: () async {
-                            final PermissionStatus permissionStatus =
-                                await Permission.sms.request();
-                            if (permissionStatus.isGranted) {
-                              try {
-                                final dynamic result =
-                                    await platform.invokeMethod('SMS', {
-                                  'selectedSimSlot': index,
-                                });
-                                values = result;
-                              } on PlatformException catch (e) {
-                                throw e.message.toString();
-                              }
-                              await Fluttertoast.showToast(
-                                  msg: values.length.toString(),
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.CENTER,
-                                  backgroundColor: Colors.grey,
-                                  textColor: Colors.white,
-                                  fontSize: 12.0);
-                            } else if (permissionStatus.isPermanentlyDenied) {
-                              await openAppSettings();
+                child: ListView.builder(
+                    itemCount: values.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return GestureDetector(
+                        onTap: () async {
+                          final PermissionStatus permissionStatus =
+                              await Permission.sms.request();
+                          if (permissionStatus.isGranted) {
+                            try {
+                              final dynamic result =
+                                  await platform.invokeMethod('SMS', {
+                                'selectedSimSlot': index,
+                              });
+                              values = result;
+                            } on PlatformException catch (e) {
+                              throw e.message.toString();
                             }
-                          },
-                          child: ListTile(
-                              title: Text('${values[index].toString()}')),
-                        );
-                      }))
+                            await Fluttertoast.showToast(
+                                msg: values.length.toString(),
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.CENTER,
+                                backgroundColor: Colors.grey,
+                                textColor: Colors.white,
+                                fontSize: 12.0);
+                          } else if (permissionStatus.isPermanentlyDenied) {
+                            await openAppSettings();
+                          }
+                        },
+                        child: Container(
+                          padding:
+                              EdgeInsets.only(left: 15.0, right: 15.0, top: 20),
+                          child: Card(
+                            child: ListTile(
+                                title: Text('${values[index].toString()}')),
+                          ),
+                        ),
+                      );
+                    }),
+              )
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
       ),
     );
   }
