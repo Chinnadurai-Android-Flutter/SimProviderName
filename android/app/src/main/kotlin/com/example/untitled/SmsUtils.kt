@@ -76,8 +76,6 @@ class SmsUtils {
                     localPendingIntent1,
                     localPendingIntent2
                 )
-
-
         }
     }
 }
