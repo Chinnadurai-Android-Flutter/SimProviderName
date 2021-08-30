@@ -52,14 +52,6 @@ class MainActivity : FlutterActivity() {
         val _sb: List<SubscriptionInfo> =
             SubscriptionManager.from(context).activeSubscriptionInfoList
         if (localSubscriptionManager.activeSubscriptionInfoCount > 1) {
-            /*val localList: List<SubscriptionInfo> =
-                localSubscriptionManager.activeSubscriptionInfoList
-            val simInfo = localList[0]
-            val simInfo1 = localList[1]
-            val sim1 = simInfo.displayName.toString()
-            val sim2 = simInfo1.displayName.toString()
-            values.add(sim1)
-            values.add(sim2)*/
             for (element in _sb) {
                 values.add(element.displayName.toString())
             }
