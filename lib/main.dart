@@ -44,6 +44,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // List<String> values = [];
     try {
       final dynamic result = await platform.invokeMethod('activeSubscriptionInfoList');
+      print('Values --> $result');
+
       setState(() {
         values = result;
       });

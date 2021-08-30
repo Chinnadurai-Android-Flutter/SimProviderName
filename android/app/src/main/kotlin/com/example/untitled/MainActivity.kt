@@ -6,18 +6,22 @@ import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
 import androidx.annotation.NonNull
+import android.content.Context
+import android.content.ContextWrapper
 import androidx.annotation.RequiresApi
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugins.GeneratedPluginRegistrant
 
-class MainActivity : FlutterActivity() {
+class MainActivity : FlutterFragmentActivity() {
     private val CHANNEL = "samples.flutter.dev"
 
     @RequiresApi(VERSION_CODES.M)
     @SuppressLint("ServiceCast", "HardwareIds")
-    override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
-        super.configureFlutterEngine(flutterEngine)
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        GeneratedPluginRegistrant.registerWith(flutterEngine)
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             CHANNEL
@@ -50,7 +54,7 @@ class MainActivity : FlutterActivity() {
             getSystemService(TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
         val values = ArrayList<String>()
         val _sb: List<SubscriptionInfo> =
-            SubscriptionManager.from(context).activeSubscriptionInfoList
+            SubscriptionManager.from(applicationContext).activeSubscriptionInfoList
         if (localSubscriptionManager.activeSubscriptionInfoCount > 1) {
             for (element in _sb) {
                 values.add(element.displayName.toString())
