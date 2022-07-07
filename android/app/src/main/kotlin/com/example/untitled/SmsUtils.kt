@@ -10,18 +10,26 @@ import android.content.IntentFilter
 import android.os.Build
 import android.telephony.SmsManager
 import android.telephony.SubscriptionManager
-import android.telephony.TelephonyManager
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 
 
 class SmsUtils {
-    @SuppressLint("MissingPermission", "NewApi")
+    @SuppressLint("MissingPermission", "NewApi", "WrongConstant", "UnspecifiedImmutableFlag")
     fun sendSMS(context: Context, phoneNumber: String, message: String, simSlot: Int) {
-        val SENT = "SMS_SENT"
-        val DELIVERED = "SMS_DELIVERED"
-        val localPendingIntent1 = PendingIntent.getBroadcast(context, 0, Intent(SENT), 0)
-        val localPendingIntent2 = PendingIntent.getBroadcast(context, 0, Intent(DELIVERED), 0)
+        val sent = "SMS_SENT"
+        val delivered = "SMS_DELIVERED"
+        val sendPendingIntent: PendingIntent
+        val deliveryPendingIntent: PendingIntent
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            sendPendingIntent = PendingIntent.getBroadcast(context, 1, Intent(sent), PendingIntent.FLAG_IMMUTABLE)
+            deliveryPendingIntent =
+                PendingIntent.getBroadcast(context, 2, Intent(delivered), PendingIntent.FLAG_IMMUTABLE)
+        } else {
+            sendPendingIntent = PendingIntent.getBroadcast(context, 1, Intent(sent), PendingIntent.FLAG_ONE_SHOT)
+            deliveryPendingIntent =
+                PendingIntent.getBroadcast(context, 2, Intent(delivered), PendingIntent.FLAG_ONE_SHOT)
+        }
+
 
         context.registerReceiver(object : BroadcastReceiver() {
             override fun onReceive(arg0: Context?, arg1: Intent?) {
@@ -48,7 +56,7 @@ class SmsUtils {
                     ).show()
                 }
             }
-        }, IntentFilter(SENT))
+        }, IntentFilter(sent))
 
         context.registerReceiver(object : BroadcastReceiver() {
             override fun onReceive(arg0: Context?, arg1: Intent?) {
@@ -63,19 +71,17 @@ class SmsUtils {
                     ).show()
                 }
             }
-        }, IntentFilter(DELIVERED))
-        if (Build.VERSION.SDK_INT >= 22) {
-            val subscriptionManager = context.getSystemService(SubscriptionManager::class.java)
-            val subscriptionInfo =
-                subscriptionManager.getActiveSubscriptionInfoForSimSlotIndex(simSlot)
-            SmsManager.getSmsManagerForSubscriptionId(subscriptionInfo.subscriptionId)
-                .sendTextMessage(
-                    phoneNumber,
-                    null,
-                    message,
-                    localPendingIntent1,
-                    localPendingIntent2
-                )
-        }
+        }, IntentFilter(delivered))
+        val subscriptionManager = context.getSystemService(SubscriptionManager::class.java)
+        val subscriptionInfo =
+            subscriptionManager.getActiveSubscriptionInfoForSimSlotIndex(simSlot)
+        SmsManager.getSmsManagerForSubscriptionId(subscriptionInfo.subscriptionId)
+            .sendTextMessage(
+                phoneNumber,
+                null,
+                message,
+                sendPendingIntent,
+                deliveryPendingIntent
+            )
     }
 }

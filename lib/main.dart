@@ -15,14 +15,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
-  final String title;
+  MyHomePage({Key? key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -30,7 +29,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  static const platform = MethodChannel('samples.flutter.dev');
+  static const platform = MethodChannel('icici.flutter.methodChannel');
   dynamic values;
 
   void _incrementCounter() {
@@ -43,7 +42,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _getBatteryLevel() async {
     // List<String> values = [];
     try {
-      final dynamic result = await platform.invokeMethod('activeSubscriptionInfoList');
+      final dynamic result =
+          await platform.invokeMethod('activeSubscriptionInfoList');
       print('Values --> $result');
 
       setState(() {
@@ -80,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text('Sim Binding'),
       ),
       body: Center(
         child: Column(
@@ -99,8 +99,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             try {
                               final dynamic result =
                                   await platform.invokeMethod('SMS', {
-                                'selectedSimSlotNumber': index,
-                                'selectedSimSlotName': values[index].toString(),
+                                'selectedSimSlotName':
+                                    values[index]['displayName'].toString(),
+                                'selectedSimSlotNumber': values[index]
+                                    ['simSlotIndex'],
                               });
                               values = result;
                             } on PlatformException catch (e) {
@@ -122,7 +124,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               EdgeInsets.only(left: 15.0, right: 15.0, top: 20),
                           child: Card(
                             child: ListTile(
-                                title: Text('${values[index].toString()}')),
+                                title: Text(
+                                    '${values[index]['displayName'].toString()}')),
                           ),
                         ),
                       );
